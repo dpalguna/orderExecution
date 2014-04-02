@@ -25,9 +25,8 @@ int main(int argc, char* argv[])
 {
 
  fstream input_file;
- bool debugMode = 1;
  executionSpecifications o_execSpecs;
- //Parameters to be read from commandline
+ //Parameters to be read from command line
  string ticker; uint64_t jumpTime;
  if(argc == 5)
   {
