@@ -111,6 +111,7 @@ int main(int argc, char* argv[])
                  {
                     updateConditionalFeatures(closingConditionalBooks,positiveStates, negativeStates, balancedState, conditionalFutureIndex);
                  }
+
           	}//If for sampling time
         }
 

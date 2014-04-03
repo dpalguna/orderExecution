@@ -29,9 +29,10 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
   errorRates f_errorRates;
   marketOrder f_MO;
   uint64_t f_jumpTime = a_execSpecs.jumpTime;
-  uint32_t numSteps = 0;
-  uint32_t uniformShares = round_to_nearest_int(static_cast<long double>(a_execSpecs.sharesToExecute)/static_cast<long double>(numSteps));
-  uint32_t f_instUniformShares = 0, f_instShares = 0;
+  uint32_t f_numSteps = 0;
+  uint32_t f_uniformShares = round_to_nearest_int(static_cast<long double>(a_execSpecs.sharesToExecute)
+		                    /(static_cast<long double>(a_execSpecs.timeHorizon)/static_cast<long double>(a_execSpecs.jumpTime)));
+  uint32_t f_instShares = 0;
   while(a_globalTime.second != FOUR_PM)
    {
  	 	f_typeOfMessage = a_buffer[a_buffer_index];
@@ -42,18 +43,18 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
  	 	if(a_globalTime.second < FOUR_PM && f_nextGlobalTime.second < FOUR_PM)
  	   	{
  	   	    if(a_globalTime.timeStampToJump(f_jumpTime) != f_nextGlobalTime.timeStampToJump(f_jumpTime) 
-						&& numSteps < a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
+						&& f_numSteps < a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
  	   	       {
- 							f_levelOneBook = bookToLevelOne(a_bidBook, a_askBook);
-							f_predictions = predict(f_levelOneBook, a_positiveStates, a_negativeStates, a_balancedState, f_jumpTime);
-							f_errorRates = get_error_rates(f_levelOneBook, a_positiveStates, a_negativeStates, a_balancedState);
-                     f_changeDetection = ((f_errorRates.probError < f_errorRates.conditionalTimeError)
+ 					f_levelOneBook = bookToLevelOne(a_bidBook, a_askBook);
+					f_predictions = predict(f_levelOneBook, a_positiveStates, a_negativeStates, a_balancedState, f_jumpTime);
+					f_errorRates = get_error_rates(f_levelOneBook, a_positiveStates, a_negativeStates, a_balancedState);
+                    f_changeDetection = ((f_errorRates.probError < f_errorRates.conditionalTimeError)
 																?f_predictions.probPrediction:f_predictions.conditionalTimePrediction);
-							f_signPrediction = ((f_errorRates.meanError<f_errorRates.conditionalMeanError)?
+					f_signPrediction = ((f_errorRates.meanError<f_errorRates.conditionalMeanError)?
                                                 f_predictions.meanPrediction:f_predictions.conditionalMeanPrediction);
                      if(f_changeDetection == 0)
                        {
-                          f_instShares = min(uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
+                          f_instShares = min(f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
                           f_MO.initialize(f_instShares,'B');
                        }
                      else
@@ -61,31 +62,39 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
                           if(f_signPrediction == 0)
                              {
                                 f_MO.initialize(0,'B');
+                                f_instShares = 0;
                              }
                           else
                              {
-		                          f_instShares = min(2*uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
-		                          f_MO.initialize(f_instShares,'B');
+		                        f_instShares = min(2*f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
+		                        f_MO.initialize(f_instShares,'B');
                              }
                        }
                     a_execSpecs.costOfExecution+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                     a_execSpecs.sharesExecuted+=f_instShares;
-                    f_instShares = min(uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted);
+                    f_instShares = min(f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted);
                     f_MO.initialize(f_instShares,'B');
                     a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
-                    numSteps++;
+                    a_execSpecs.uniformSharesExecuted+=f_instShares;
+                    f_numSteps++;
+                    cout<<endl<<f_numSteps;
+                    a_execSpecs.print();
+
       		    }//Checking for sampling interval
-              if(numSteps == a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
+              if(f_numSteps == a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
                 {
-						f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted;
-						f_MO.initialize(f_instShares,'B');
+				  f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted;
+				  f_MO.initialize(f_instShares,'B');
                   a_execSpecs.costOfExecution+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                   a_execSpecs.sharesExecuted+=f_instShares;
-						f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted;
-						f_MO.initialize(f_instShares,'B');
+		          f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted;
+				  f_MO.initialize(f_instShares,'B');
                   a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                   a_execSpecs.uniformSharesExecuted+=f_instShares;
-					 }
+                  cout<<endl<<f_numSteps;
+                  a_execSpecs.print();
+                  f_numSteps++;
+				}
     		}
    }
   

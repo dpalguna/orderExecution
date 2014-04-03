@@ -593,23 +593,27 @@ class executionSpecifications
 {
 	public:
 	uint32_t sharesToExecute;
-   uint64_t timeHorizon;
-   uint64_t costOfExecution;
-   uint64_t costOfUniform;
-   uint32_t sharesExecuted;
-   uint32_t uniformSharesExecuted;
-   uint64_t jumpTime;
+    uint64_t timeHorizon;
+    uint64_t costOfExecution;
+    uint64_t costOfUniform;
+    uint32_t sharesExecuted;
+    uint32_t uniformSharesExecuted;
+    uint64_t jumpTime;
 
 	void initialize(uint32_t a_sh, uint64_t a_th, uint64_t a_ce, uint64_t a_cu, uint32_t a_se, uint32_t a_use, uint64_t a_jt)
+     {
+       sharesToExecute = a_sh;
+       timeHorizon = a_th;
+	   costOfExecution = a_ce;
+       costOfUniform = a_cu;
+       sharesExecuted = a_se;
+       uniformSharesExecuted = a_use;
+	   jumpTime = a_jt;
+       return;
+     }
+   void print()
    {
-      sharesToExecute = a_sh;
-      timeHorizon = a_th;
-		costOfExecution = a_ce;
-      costOfUniform = a_cu;
-      sharesExecuted = a_se;
-      uniformSharesExecuted = a_use;
-		jumpTime = a_jt;		
-      return;
+	   cout<<endl<<sharesToExecute<<" "<<timeHorizon<<" "<<costOfExecution<<" "<<costOfUniform<<" "<<sharesExecuted<<" "<<uniformSharesExecuted<<" "<<jumpTime;
    }
 };
 

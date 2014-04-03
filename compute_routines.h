@@ -33,10 +33,10 @@ void updateFeatures(vector<oneDState>& a_positiveStates, vector<oneDState>& a_ne
                                                  != (a_pastLevelOneBook.bidPrice+a_pastLevelOneBook.askPrice)));
     bool t_conditionalTimeError = (o_pred.conditionalTimePrediction != ((a_currentLevelOneBook.bidPrice+a_currentLevelOneBook.askPrice) 
                                                  != (a_pastLevelOneBook.bidPrice+a_pastLevelOneBook.askPrice)));
-    bool t_meanError = (o_pred.meanPrediction != (a_currentLevelOneBook.bidPrice+a_currentLevelOneBook.askPrice) > 
-                                                 (a_pastLevelOneBook.bidPrice+a_pastLevelOneBook.askPrice)) ;
-    bool t_conditionalMeanError = (o_pred.conditionalMeanPrediction != (a_currentLevelOneBook.bidPrice+a_currentLevelOneBook.askPrice) > 
-                                                 (a_pastLevelOneBook.bidPrice+a_pastLevelOneBook.askPrice)) ;
+    bool t_meanError = (o_pred.meanPrediction != ((a_currentLevelOneBook.bidPrice+a_currentLevelOneBook.askPrice)>
+    											 (a_pastLevelOneBook.bidPrice+a_pastLevelOneBook.askPrice)));
+    bool t_conditionalMeanError = (o_pred.conditionalMeanPrediction!=((a_currentLevelOneBook.bidPrice+a_currentLevelOneBook.askPrice)>
+    											 (a_pastLevelOneBook.bidPrice+a_pastLevelOneBook.askPrice)));
     if(a_pastLevelOneBook.bidShares > a_pastLevelOneBook.askShares)
        {
            int a_imb = min(a_pastLevelOneBook.bidShares/100-a_pastLevelOneBook.askShares/100, static_cast<uint32_t>(MAX_IMBALANCE));
@@ -154,7 +154,7 @@ void updateConditionalFeatures(vector<levelOneBook>& a_closingConditionalBooks, 
                = (a_ODS.stateFeatures.conditionalMeanMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ midPriceChange)
                  /(static_cast<long double>(a_ODS.numberOfMidPriceChanges)+1.0);
                a_positiveStates[a_imb].stateFeatures.timeToMidPriceChange
-               = (a_ODS.stateFeatures.timeToMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ midPriceChange)
+               = (a_ODS.stateFeatures.timeToMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ timeToMidPriceChange)
                  /(static_cast<long double>(a_ODS.numberOfMidPriceChanges)+1.0);
                a_positiveStates[a_imb].numberOfMidPriceChanges++;
 
@@ -170,7 +170,7 @@ void updateConditionalFeatures(vector<levelOneBook>& a_closingConditionalBooks, 
                = (a_ODS.stateFeatures.conditionalMeanMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ midPriceChange)
                  /(static_cast<long double>(a_ODS.numberOfMidPriceChanges)+1.0);
                a_negativeStates[a_imb].stateFeatures.timeToMidPriceChange
-               = (a_ODS.stateFeatures.timeToMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ midPriceChange)
+               = (a_ODS.stateFeatures.timeToMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ timeToMidPriceChange)
                  /(static_cast<long double>(a_ODS.numberOfMidPriceChanges)+1.0);
 	            a_negativeStates[a_imb].numberOfMidPriceChanges++;
        		}
@@ -184,7 +184,7 @@ void updateConditionalFeatures(vector<levelOneBook>& a_closingConditionalBooks, 
                = (a_ODS.stateFeatures.conditionalMeanMidPriceChange*(static_cast<long double>(a_ODS.timeSpan))+ midPriceChange)
                  /(static_cast<long double>(a_ODS.numberOfMidPriceChanges)+1.0);
                a_balancedState.stateFeatures.timeToMidPriceChange
-               = (a_ODS.stateFeatures.timeToMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ midPriceChange)
+               = (a_ODS.stateFeatures.timeToMidPriceChange*(static_cast<long double>(a_ODS.numberOfMidPriceChanges))+ timeToMidPriceChange)
                  /(static_cast<long double>(a_ODS.numberOfMidPriceChanges)+1.0);
 	            a_balancedState.numberOfMidPriceChanges++;
 	   		}
@@ -210,7 +210,6 @@ predictions predict(levelOneBook a_lob,
          predictions o_predictions;
 			if(a_bs > a_as)
    			{
-        		   oneDState a_ODS = a_positiveStates[min(a_bs/100-a_as/100,static_cast<uint32_t>(MAX_IMBALANCE))];
                uint32_t a_imb = min(a_bs/100-a_as/100,static_cast<uint32_t>(MAX_IMBALANCE));
                features a_sf = a_positiveStates[a_imb].stateFeatures;
                o_predictions.probPrediction = (a_sf.probMidPriceChange > 0);
@@ -220,7 +219,6 @@ predictions predict(levelOneBook a_lob,
       		}
 			else if(a_bs < a_as)
    			{
-               oneDState a_ODS = a_negativeStates[min(a_as/100-a_bs/100,static_cast<uint32_t>(MAX_IMBALANCE))];
                uint32_t a_imb = min(a_as/100-a_bs/100,static_cast<uint32_t>(MAX_IMBALANCE));
                features a_sf = a_negativeStates[a_imb].stateFeatures;
                o_predictions.probPrediction = (a_sf.probMidPriceChange > 0);
@@ -229,7 +227,7 @@ predictions predict(levelOneBook a_lob,
                o_predictions.conditionalTimePrediction = (a_sf.timeToMidPriceChange < a_jumpTime);
        		}
    		else
-    			{
+  			{
                features a_sf = a_balancedState.stateFeatures;
                o_predictions.probPrediction = (a_sf.probMidPriceChange > 0);
                o_predictions.meanPrediction = (a_sf.meanMidPriceChange > 0);
