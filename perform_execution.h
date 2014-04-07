@@ -35,6 +35,7 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
   uint32_t f_instShares = 0;
   while(a_globalTime.second != FOUR_PM)
    {
+
  	 	f_typeOfMessage = a_buffer[a_buffer_index];
  	 	read_and_update(f_typeOfMessage, a_buffer, a_buffer_index, a_bidBook, a_askBook, a_OID_to_properties,a_globalTime);
  	 	globalTime f_nextGlobalTime;
@@ -55,34 +56,50 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
                      if(f_changeDetection == 0)
                        {
                           f_instShares = min(f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
-                          f_MO.initialize(f_instShares,'B');
+                          f_MO.initialize(f_instShares,a_execSpecs.buyOrSell);
                        }
                      else
                        {
-                          if(f_signPrediction == 0)
+                          if(f_signPrediction == 0)//Predict down
                              {
-                                f_MO.initialize(0,'B');
-                                f_instShares = 0;
+                        	   if(a_execSpecs.buyOrSell == 'B')//buying means slow down
+                        	   {
+                        		   f_MO.initialize(0,a_execSpecs.buyOrSell);
+                        		   f_instShares = 0;
+                        	   }
+                        	   else//selling means accelerate
+                        	   {
+                        		   f_instShares = min(2*f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
+                        		   f_MO.initialize(f_instShares,a_execSpecs.buyOrSell);
+                        	   }
                              }
-                          else
+                          else//Predict up
                              {
-		                        f_instShares = min(2*f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
-		                        f_MO.initialize(f_instShares,'B');
+                        	   if(a_execSpecs.buyOrSell == 'B')//buying means accelerate
+                        	   {
+                        		   f_instShares = min(2*f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
+                        		   f_MO.initialize(f_instShares,a_execSpecs.buyOrSell);
+                        	   }
+                        	   else//selling means slow down
+                        	   {
+                        		   f_MO.initialize(0,a_execSpecs.buyOrSell);
+                        		   f_instShares = 0;
+                        	   }
                              }
                        }
                     a_execSpecs.costOfExecution+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                     a_execSpecs.sharesExecuted+=f_instShares;
                     f_instShares = min(f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted);
-                    f_MO.initialize(f_instShares,'B');
+                    f_MO.initialize(f_instShares,a_execSpecs.buyOrSell);
                     a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                     a_execSpecs.uniformSharesExecuted+=f_instShares;
-                    f_numSteps++;
-                    cout<<endl<<f_numSteps;
                     a_execSpecs.print();
-
-      		    }//Checking for sampling interval
+                    cin.get();
+                    f_numSteps++;
+       		    }//Checking for sampling interval
               if(f_numSteps == a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
                 {
+            	  //cerr<<endl<<"Last step";
 				  f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted;
 				  f_MO.initialize(f_instShares,'B');
                   a_execSpecs.costOfExecution+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
@@ -91,7 +108,6 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
 				  f_MO.initialize(f_instShares,'B');
                   a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                   a_execSpecs.uniformSharesExecuted+=f_instShares;
-                  cout<<endl<<f_numSteps;
                   a_execSpecs.print();
                   f_numSteps++;
 				}

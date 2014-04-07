@@ -592,6 +592,8 @@ class oneDState
 class executionSpecifications
 {
 	public:
+	string ticker;
+	char buyOrSell;
 	uint32_t sharesToExecute;
     uint64_t timeHorizon;
     uint64_t costOfExecution;
@@ -600,8 +602,11 @@ class executionSpecifications
     uint32_t uniformSharesExecuted;
     uint64_t jumpTime;
 
-	void initialize(uint32_t a_sh, uint64_t a_th, uint64_t a_ce, uint64_t a_cu, uint32_t a_se, uint32_t a_use, uint64_t a_jt)
+
+	void initialize(string a_tick, char a_bos, uint32_t a_sh, uint64_t a_th, uint64_t a_ce, uint64_t a_cu, uint32_t a_se, uint32_t a_use, uint64_t a_jt)
      {
+	   ticker = a_tick;
+	   buyOrSell = a_bos;
        sharesToExecute = a_sh;
        timeHorizon = a_th;
 	   costOfExecution = a_ce;
@@ -613,7 +618,7 @@ class executionSpecifications
      }
    void print()
    {
-	   cout<<endl<<sharesToExecute<<" "<<timeHorizon<<" "<<costOfExecution<<" "<<costOfUniform<<" "<<sharesExecuted<<" "<<uniformSharesExecuted<<" "<<jumpTime;
+	   cout<<endl<<ticker<<" "<<sharesToExecute<<" "<<timeHorizon<<" "<<costOfExecution<<" "<<costOfUniform<<" "<<sharesExecuted<<" "<<uniformSharesExecuted<<" "<<jumpTime;
    }
 };
 

@@ -145,7 +145,7 @@ void updateConditionalFeatures(vector<levelOneBook>& a_closingConditionalBooks, 
      {
 			if((it->bidShares) > (it->askShares))
    			{
-        		   long double midPriceChange = static_cast<long double>(futureLevelOneBook.bidPrice+futureLevelOneBook.askPrice)/2.0-
+        	   long double midPriceChange = static_cast<long double>(futureLevelOneBook.bidPrice+futureLevelOneBook.askPrice)/2.0-
                                             static_cast<long double>(it->bidPrice+it->askPrice)/2.0;
                long double timeToMidPriceChange = static_cast<long double>(a_futureIndex - a_index);
                oneDState a_ODS = a_positiveStates[min(it->bidShares/100-it->askShares/100,static_cast<uint32_t>(MAX_IMBALANCE))];
@@ -175,7 +175,7 @@ void updateConditionalFeatures(vector<levelOneBook>& a_closingConditionalBooks, 
 	            a_negativeStates[a_imb].numberOfMidPriceChanges++;
        		}
    		else
-    			{
+    		{
                long double midPriceChange = static_cast<long double>(futureLevelOneBook.bidPrice+futureLevelOneBook.askPrice)/2.0-
                                             static_cast<long double>(it->bidPrice+it->askPrice)/2.0;
                long double timeToMidPriceChange = static_cast<long double>(a_futureIndex - a_index);
@@ -205,9 +205,7 @@ predictions predict(levelOneBook a_lob,
 
 			uint32_t a_bs = a_lob.bidShares;
 			uint32_t a_as = a_lob.askShares;
-			uint32_t a_bp = a_lob.bidPrice;
-			uint32_t a_ap = a_lob.askPrice;
-         predictions o_predictions;
+			predictions o_predictions;
 			if(a_bs > a_as)
    			{
                uint32_t a_imb = min(a_bs/100-a_as/100,static_cast<uint32_t>(MAX_IMBALANCE));
@@ -245,24 +243,19 @@ errorRates get_error_rates(levelOneBook a_lob,
 
 			uint32_t a_bs = a_lob.bidShares;
 			uint32_t a_as = a_lob.askShares;
-			uint32_t a_bp = a_lob.bidPrice;
-			uint32_t a_ap = a_lob.askPrice;
 			errorRates f_errorRates;
 			if(a_bs > a_as)
    			{
-        		   oneDState a_ODS = a_positiveStates[min(a_bs/100-a_as/100,static_cast<uint32_t>(MAX_IMBALANCE))];
                uint32_t a_imb = min(a_bs/100-a_as/100,static_cast<uint32_t>(MAX_IMBALANCE));
                f_errorRates = a_positiveStates[a_imb].stateErrorRates;
             }
 			else if(a_bs < a_as)
    			{
-               oneDState a_ODS = a_negativeStates[min(a_as/100-a_bs/100,static_cast<uint32_t>(MAX_IMBALANCE))];
                uint32_t a_imb = min(a_as/100-a_bs/100,static_cast<uint32_t>(MAX_IMBALANCE));
                f_errorRates = a_negativeStates[a_imb].stateErrorRates;
        		}
-   		else
-    			{
-               features a_sf = a_balancedState.stateFeatures;
+			else
+    		{
                f_errorRates = a_balancedState.stateErrorRates;
 	   		}
   

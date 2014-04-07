@@ -1,0 +1,54 @@
+
+../read_file/split/C 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/C 3600 3600000 1730339800 1735172800 3600 3600 2000
+../read_file/split/BAC 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/BAC 3600 3600000 601609600 601620600 3600 3600 2000
+../read_file/split/BP 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/BP 3600 3600000 1700956800 1702136800 3600 3600 2000
+../read_file/split/GE 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/GE 3600 3600000 911434000 910746600 3600 3600 2000
+../read_file/split/F 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/F 3600 3600000 550986800 551000600 3600 3600 2000
+../read_file/split/S 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/S 3600 3600000 309053800 309049200 3600 3600 2000
+../read_file/split/PFE 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/PFE 3600 3600000 1086605000 1086444000 3600 3600 2000
+../read_file/split/JPM 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/JPM 3600 3600000 1994790000 1995992200 3600 3600 2000
+../read_file/split/WFC 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/WFC 3600 3600000 1642322000 1643752000 3600 3600 2000
+
+../read_file/split/LVS 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/LVS 3600 3600000 2673430600 2677460200 3600 3600 2000
+../read_file/split/XOM 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/XOM 3600 3600000 3440730900 3442668700 3600 3600 2000
+../read_file/split/NOK 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/NOK 3600 3600000 253728800 253728800 3600 3600 2000
+../read_file/split/T 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/T 3600 3600000 1201316000 1201992200 3600 3600 2000
+../read_file/split/VALE 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/VALE 3600 3600000 488970800 488589600 3600 3600 2000
+
+../read_file/split/MGM 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/MGM 3600 3600000 841154700 842375500 3600 3600 2000
+../read_file/split/HAL 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/HAL 3600 3600000 1734581400 1734163600 3600 3600 2000
+../read_file/split/Q 3600 3600000 0 0 0 0 2000
+Calling perform execution
+../read_file/split/Q 3600 3600000 1679990600 1680955200 3600 3600 2000

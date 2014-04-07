@@ -28,11 +28,12 @@ int main(int argc, char* argv[])
  executionSpecifications o_execSpecs;
  //Parameters to be read from command line
  string ticker; uint64_t jumpTime;
- if(argc == 5)
+ if(argc == 6)
   {
    ticker = argv[1];
-   o_execSpecs.initialize(atoi(argv[2]), atoi(argv[3]),0,0,0,0,atoi(argv[4]));
-   jumpTime = atoi(argv[4]);
+   o_execSpecs.initialize(ticker, *argv[2], atoi(argv[3]), atoi(argv[4]),0,0,0,0,atoi(argv[5]));
+
+   jumpTime = atoi(argv[5]);
   }
  else
   {
@@ -87,43 +88,45 @@ int main(int argc, char* argv[])
         {
     	   if(o_globalTime.timeStampToMs() != o_nextGlobalTime.timeStampToMs())
              {
-    		      int numMultiples = o_nextGlobalTime.timeStampToMs() - o_globalTime.timeStampToMs()+(o_globalTime.nanoSecond%(MS_TO_NS) == 0);
-               levelOneBook lob = bookToLevelOne(bidBook,askBook);
-               marketOrder t_MO;
-               for(int i = 0; i< numMultiples; i++)
-                 {
-                   predictions o_pred;
-						 o_pred = predict(lob, positiveStates, negativeStates, balancedState,jumpTime);
-                   closingBooks[closingBookIndex].initialize(lob.bidShares, lob.askShares, lob.bidPrice, lob.askPrice, o_pred);
-                   closingConditionalBooks.push_back(closingBooks[closingBookIndex]);
-                   closingBookIndex = ((closingBookIndex == (jumpTime))? 0: (closingBookIndex+1));
-                 }
-               int conditionalFutureIndex = closingConditionalBooks.size()-numMultiples;
-             	if(o_globalTime.second > NINE_THIRTY_AM + jumpTime/(S_TO_MS))
-           		  {
-               		int pastIndex = ((closingBookIndex == jumpTime)?0:(closingBookIndex+1));
-               		levelOneBook pastLevelOneBook = closingBooks[pastIndex];
-               		levelOneBook currentLevelOneBook = closingBooks[closingBookIndex];
-               		updateFeatures(positiveStates,negativeStates,balancedState,currentLevelOneBook,pastLevelOneBook);
-                 }//Update features that look ahead for a constant time interval
-               if(closingConditionalBooks.begin()->bidPrice != closingConditionalBooks.rbegin()->bidPrice ||
+    		   	   int numMultiples = o_nextGlobalTime.timeStampToMs() - o_globalTime.timeStampToMs()+(o_globalTime.nanoSecond%(MS_TO_NS) == 0);
+    		   	   levelOneBook lob = bookToLevelOne(bidBook,askBook);
+    		   	   marketOrder t_MO;
+
+    		   	   for(int i = 0; i< numMultiples; i++)
+    		   	   {
+    		   		   predictions o_pred;
+    		   		   o_pred = predict(lob, positiveStates, negativeStates, balancedState,jumpTime);
+    		   		   closingBooks[closingBookIndex].initialize(lob.bidShares, lob.askShares, lob.bidPrice, lob.askPrice, o_pred);
+    		   		   closingConditionalBooks.push_back(closingBooks[closingBookIndex]);
+    		   		   closingBookIndex = ((closingBookIndex == (jumpTime))? 0: (closingBookIndex+1));
+    		   	   }
+    		   	   int conditionalFutureIndex = closingConditionalBooks.size()-numMultiples;
+    		   	   if(o_globalTime.second > NINE_THIRTY_AM + jumpTime/(S_TO_MS))
+    		   	   {
+    		   		  int pastIndex = ((closingBookIndex == jumpTime)?0:(closingBookIndex+1));
+    		   		  levelOneBook pastLevelOneBook = closingBooks[pastIndex];
+    		   		  levelOneBook currentLevelOneBook = closingBooks[closingBookIndex];
+    		   		  updateFeatures(positiveStates,negativeStates,balancedState,currentLevelOneBook,pastLevelOneBook);
+    		   	   }//Update features that look ahead for a constant time interval
+    		   	   if(closingConditionalBooks.begin()->bidPrice != closingConditionalBooks.rbegin()->bidPrice ||
 						closingConditionalBooks.begin()->askPrice != closingConditionalBooks.rbegin()->askPrice)//Mid price has changed
-                 {
-                    updateConditionalFeatures(closingConditionalBooks,positiveStates, negativeStates, balancedState, conditionalFutureIndex);
-                 }
+    		   	   {
+    		   		   updateConditionalFeatures(closingConditionalBooks,positiveStates, negativeStates, balancedState, conditionalFutureIndex);
+    		   	   }
 
           	}//If for sampling time
         }
 
 		 if(start_of_trading && o_globalTime.second == TWO_THIRTY_PM && typeOfMessage == 'T')
         {
+		   cerr<<endl<<"Calling perform execution";
            perform_execution(bidBook, askBook, orderID_to_properties, o_globalTime, positiveStates, negativeStates, balancedState, buffer, buffer_index, o_execSpecs);
         }
        end_of_day = (o_globalTime.second == FOUR_PM);
      }
      
    }
- cout<<endl<<"Exiting:";
+
  delete[] buffer;
  return 0;
 }
