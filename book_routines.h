@@ -341,8 +341,8 @@ uint64_t execute_shadow_market_order(map<uint32_t, map<uint64_t, order> >&a_bidB
  				 while(oit != (pit->second).end() && totalSharesLeft > 0)
 					{
 						sharesExecuted = (totalSharesLeft > (oit->second).shares)?(oit->second).shares:totalSharesLeft;
-                  totalSharesLeft = (totalSharesLeft > (oit->second).shares)?totalSharesLeft-(oit->second).shares:0;
-                  totalCost += (pit->first)*sharesExecuted;
+						totalSharesLeft = (totalSharesLeft > (oit->second).shares)?totalSharesLeft-(oit->second).shares:0;
+						totalCost += (pit->first)*sharesExecuted;
 						oit++;
 					}
 				 pit++;
@@ -357,8 +357,8 @@ uint64_t execute_shadow_market_order(map<uint32_t, map<uint64_t, order> >&a_bidB
  				 while(oit != (pit->second).end() && totalSharesLeft > 0)
 					{
 						sharesExecuted = (totalSharesLeft > (oit->second).shares)?(oit->second).shares:totalSharesLeft;
-                  totalSharesLeft = (totalSharesLeft > (oit->second).shares)?totalSharesLeft-(oit->second).shares:0;
-                  totalCost += (pit->first)*sharesExecuted;
+						totalSharesLeft = (totalSharesLeft > (oit->second).shares)?totalSharesLeft-(oit->second).shares:0;
+						totalCost += (pit->first)*sharesExecuted;
 						oit++;
 					}
 				 pit++;

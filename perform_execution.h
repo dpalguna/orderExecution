@@ -33,7 +33,8 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
   uint32_t f_uniformShares = round_to_nearest_int(static_cast<long double>(a_execSpecs.sharesToExecute)
 		                    /(static_cast<long double>(a_execSpecs.timeHorizon)/static_cast<long double>(a_execSpecs.jumpTime)));
   uint32_t f_instShares = 0;
-  while(a_globalTime.second != FOUR_PM)
+
+  while(a_globalTime.second != FOUR_PM && f_numSteps < a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
    {
 
  	 	f_typeOfMessage = a_buffer[a_buffer_index];
@@ -44,7 +45,7 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
  	 	if(a_globalTime.second < FOUR_PM && f_nextGlobalTime.second < FOUR_PM)
  	   	{
  	   	    if(a_globalTime.timeStampToJump(f_jumpTime) != f_nextGlobalTime.timeStampToJump(f_jumpTime) 
-						&& f_numSteps < a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
+						&& f_numSteps < a_execSpecs.timeHorizon/a_execSpecs.jumpTime-1)
  	   	       {
  					f_levelOneBook = bookToLevelOne(a_bidBook, a_askBook);
 					f_predictions = predict(f_levelOneBook, a_positiveStates, a_negativeStates, a_balancedState, f_jumpTime);
@@ -53,12 +54,15 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
 																?f_predictions.probPrediction:f_predictions.conditionalTimePrediction);
 					f_signPrediction = ((f_errorRates.meanError<f_errorRates.conditionalMeanError)?
                                                 f_predictions.meanPrediction:f_predictions.conditionalMeanPrediction);
-                     if(f_changeDetection == 0)
+					//printf("%Lf %Lf %Lf %Lf\n", f_errorRates.probError, f_errorRates.conditionalTimeError, f_errorRates.meanError, f_errorRates.conditionalMeanError);
+					f_changeDetection = ((min(f_errorRates.probError, f_errorRates.conditionalTimeError) > 0.5)
+							|| (min(f_errorRates.meanError, f_errorRates.conditionalMeanError) > 0.5))?0:f_changeDetection;
+                     if(f_changeDetection == 0)//predict flat
                        {
                           f_instShares = min(f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
                           f_MO.initialize(f_instShares,a_execSpecs.buyOrSell);
                        }
-                     else
+                     else//predict change
                        {
                           if(f_signPrediction == 0)//Predict down
                              {
@@ -93,19 +97,21 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
                     f_MO.initialize(f_instShares,a_execSpecs.buyOrSell);
                     a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                     a_execSpecs.uniformSharesExecuted+=f_instShares;
-                    a_execSpecs.print();
-                    cin.get();
+
+
                     f_numSteps++;
        		    }//Checking for sampling interval
-              if(f_numSteps == a_execSpecs.timeHorizon/a_execSpecs.jumpTime)
+              if(f_numSteps == a_execSpecs.timeHorizon/a_execSpecs.jumpTime-1)
                 {
             	  //cerr<<endl<<"Last step";
 				  f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted;
 				  f_MO.initialize(f_instShares,'B');
                   a_execSpecs.costOfExecution+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                   a_execSpecs.sharesExecuted+=f_instShares;
+                  cout<<f_instShares;
 		          f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted;
 				  f_MO.initialize(f_instShares,'B');
+				  cout<<" "<<f_instShares<<" "<<f_numSteps;
                   a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                   a_execSpecs.uniformSharesExecuted+=f_instShares;
                   a_execSpecs.print();
@@ -116,8 +122,6 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
   
   return;
 }
-
-
 
 #endif /* PERFORM_EXECUTION_H_ */
 
