@@ -17,6 +17,8 @@
    Remove "dead orders" when execution messages disobey priorities.
    To run, pass command line parameters for the ticker file and the \delta
 
+   Need to introduce a parameter for error rate threshold.
+
 */
 
 using namespace std;
