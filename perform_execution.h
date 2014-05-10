@@ -55,8 +55,8 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
 					f_signPrediction = ((f_errorRates.meanError<f_errorRates.conditionalMeanError)?
                                                 f_predictions.meanPrediction:f_predictions.conditionalMeanPrediction);
 					//printf("%Lf %Lf %Lf %Lf\n", f_errorRates.probError, f_errorRates.conditionalTimeError, f_errorRates.meanError, f_errorRates.conditionalMeanError);
-					f_changeDetection = ((min(f_errorRates.probError, f_errorRates.conditionalTimeError) > 0.5)
-							|| (min(f_errorRates.meanError, f_errorRates.conditionalMeanError) > 0.5))?0:f_changeDetection;
+					f_changeDetection = ((min(f_errorRates.probError, f_errorRates.conditionalTimeError) > 0.9)
+							|| (min(f_errorRates.meanError, f_errorRates.conditionalMeanError) > 0.9))?0:f_changeDetection;
                      if(f_changeDetection == 0)//predict flat
                        {
                           f_instShares = min(f_uniformShares, a_execSpecs.sharesToExecute-a_execSpecs.sharesExecuted);
@@ -111,7 +111,7 @@ void perform_execution(map<uint32_t, map<uint64_t, order> >& a_bidBook, map<uint
                   cout<<f_instShares;
 		          f_instShares = a_execSpecs.sharesToExecute-a_execSpecs.uniformSharesExecuted;
 				  f_MO.initialize(f_instShares,'B');
-				  cout<<" "<<f_instShares<<" "<<f_numSteps;
+				  //cout<<" "<<f_instShares<<" "<<f_numSteps;
                   a_execSpecs.costOfUniform+=execute_shadow_market_order(a_bidBook,a_askBook,f_MO);
                   a_execSpecs.uniformSharesExecuted+=f_instShares;
                   a_execSpecs.print();
